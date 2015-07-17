@@ -93,7 +93,7 @@ class Donger(object):
         if ev.splitd[0].startswith("!") or ev.arguments[0].startswith(cli.nickname) or ev.arguments[0].startswith("fuck off"):
             try:
                 if ev.target != self.primarychan and ev.source == self.sourcehistory[-2] and ev.source == self.sourcehistory[-1] and time.time() - self.lastheardfrom[ev.source] < 10:
-                    return #If the user was the last two users to speak and the last msg was within 10 seconds, don't do anything. Flood control.
+                    return #Si el usuario fue el último de los dos usuarios en hablar, y el último mensaje era antes de 10 segs, no hacer nada. Control de flood
             except IndexError:
                 pass
             finally:
@@ -107,15 +107,15 @@ class Donger(object):
                 return
  
             if self.gamerunning:
-                cli.privmsg(self.primarychan, "There's already a fight in progress.")
+                cli.privmsg(self.primarychan, "Hay una pelea en progreso.")
                 return
                 
             if len(ev.splitd) == 1 or ev.splitd[1] == "": # I hate you
-                cli.privmsg(self.primarychan, "Can you read? It's {0} <nick> [othernick] ...".format(ev.splitd[0]))
+                cli.privmsg(self.primarychan, "Puedes leer? Es {0} <nick> [othernick] ...".format(ev.splitd[0]))
                 return
             
             if cli.channels[ev.target.lower()].users[ev.source.lower()].account is None:
-                cli.privmsg(self.primarychan, "You must be identified with nickserv to play!")
+                cli.privmsg(self.primarychan, "Debes estar identificado con NickServ para jugar!")
                 return
             
             self.deathmatch = False
@@ -128,10 +128,10 @@ class Donger(object):
 
             if ev.splitd[0] == "!deathmatch":
                 if cli.nickname in ev.splitd:
-                    cli.privmsg(self.primarychan, "Sorry, but {0} is unavailable for a deathmatch.".format(cli.nickname))
+                    cli.privmsg(self.primarychan, "Disculpa, pero {0} no está disponible para un torneo a muerte.".format(cli.nickname))
                     return
                 elif len(ev.splitd) != 2:
-                    cli.privmsg(self.primarychan, "Deathmatches are 1 v 1 only.")
+                    cli.privmsg(self.primarychan, "Los torneos a muerte son 1 contra 1.")
                     return
                 self.deathmatch = True
 
@@ -142,14 +142,14 @@ class Donger(object):
                 try: # Check if the challenged user is on the channel..
                     cli.channels[self.primarychan].users[i.lower()]
                 except:
-                    cli.privmsg(self.primarychan, "There's no one named {0} on this channel".format(i))
+                    cli.privmsg(self.primarychan, "No hay nadie llamado {0} en este canal".format(i))
                     return
                 if cli.channels[self.primarychan].users[i.lower()].account is None:
-                    cli.privmsg(self.primarychan, "\002{0}\002 is not identified with nickserv!".format(i))
+                    cli.privmsg(self.primarychan, "\002{0}\002 no está identificado con nickserv!".format(i))
                     return
             
                 if cli.channels[self.primarychan].users[i.lower()].host == ev.source2.host:
-                    cli.privmsg(self.primarychan, "Stop hitting yourself.")
+                    cli.privmsg(self.primarychan, "Deja de golpearte.")
                     return 
                 
                 pplayers.append(cli.channels[self.primarychan].users[i.lower()].nick)
@@ -166,36 +166,36 @@ class Donger(object):
             self._paccept[ev.source2.nick.lower()] = copy.copy(pplayers)
             self._paccept[ev.source2.nick.lower()].remove(ev.source)
             if cli.nickname.lower() in players:
-                cli.privmsg(self.primarychan, "YOU WILL SEE")
+                cli.privmsg(self.primarychan, "TÚ PUEDES VERLO")
                 self._paccept[ev.source2.nick.lower()].remove(cli.nickname)
                 if self._paccept[ev.source2.nick.lower()] == []:
                     self.fight(cli, pplayers, ev.source2.nick.lower())
                     return
             if self.deathmatch == True:
-                cli.privmsg(self.primarychan, "{1}: \002{0}\002 has challenged you to a deathmatch. The loser will be bant for 20 minutes. To accept, use '!accept {0}'".format(ev.source, ", ".join(self._paccept[ev.source2.nick.lower()])))
+                cli.privmsg(self.primarychan, "{1}: \002{0}\002 te ha retado a un torneo a muerte. El perdedor será baneado por 20 minutos. Para aceptar, use '!accept {0}'".format(ev.source, ", ".join(self._paccept[ev.source2.nick.lower()])))
             else:
-                cli.privmsg(self.primarychan, "{1}: \002{0}\002 has challenged you. To accept, use '!accept {0}'".format(ev.source, ", ".join(self._paccept[ev.source2.nick.lower()])))
+                cli.privmsg(self.primarychan, "{1}: \002{0}\002 te ha retado. Para aceptar, use '!accept {0}'".format(ev.source, ", ".join(self._paccept[ev.source2.nick.lower()])))
         elif ev.splitd[0] == "!accept":
             self.deathmatch = False #We'll do this and check later if it's a deathmatch.
 
             if self.gamerunning:
-                cli.privmsg(self.primarychan, "WAIT TILL THIS FUCKING GAME ENDS")
+                cli.privmsg(self.primarychan, "ESPERA HASTA QUE ESTE DESGRACIADO JUEGO TERMINE")
                 return
                 
             if len(ev.splitd) == 1 or ev.splitd[1] == "": # I hate you
-                cli.privmsg(self.primarychan, "Can you read? It's !accept <nick>")
+                cli.privmsg(self.primarychan, "Puedes leer? Es !accept <nick>")
                 return
             ev.splitd[1] = ev.splitd[1].lower()
             try:
                 if ev.source not in self.pending[ev.splitd[1]]:
                     raise  # two in one
             except:
-                cli.privmsg(self.primarychan, "Err... Maybe you meant to say \002!fight {0}\002? They never challenged you.".format(ev.splitd[1]))
+                cli.privmsg(self.primarychan, "Err... Quizás quisiste decir \002!fight {0}\002? Él nunca te ha retado.".format(ev.splitd[1]))
                 return
             try: # Check if the challenged user is on the channel..
                 cli.channels[self.primarychan].users[ev.splitd[1]]
             except:
-                cli.privmsg(self.primarychan, "They're not here anymore - maybe they were intimidated by your donger.")
+                cli.privmsg(self.primarychan, "No hay nadie más - tal vez fueron intimidados por tu donger.")
                 del self.pending[ev.splitd[1]]
                 return
             
@@ -215,18 +215,18 @@ class Donger(object):
                 return
                 
             if self.turn != ev.source.lower():
-                cli.privmsg(self.primarychan, "Wait your fucking turn or I'll kill you.")
+                cli.privmsg(self.primarychan, "Espera tu maldito turno o te mataré.")
                 return
             
             if ev.source.lower() not in self.aliveplayers:
-                cli.privmsg(self.primarychan, "GET OUT OR I'LL KILL YOU! INTRUDER INTRUDER INTRUDER")
+                cli.privmsg(self.primarychan, "LÁRGATE DE AQUÍ O TE MATARÉ! INTRUSO INTRUSO INTRUSO")
             
             if len(ev.splitd) != 1 and ev.splitd[1] != "":
                 if ev.splitd[1].lower() not in self.aliveplayers and ev.splitd[1].lower() in list(self.health):
-                    cli.privmsg(self.primarychan, "WHAT?! Do you REALLY want to hit a corpse?!")
+                    cli.privmsg(self.primarychan, "QUÉ?! REALMENTE QUIERES GOLPEAR A UN CADÁVER?!")
                     return
                 elif ev.splitd[1].lower() not in self.aliveplayers:
-                    cli.privmsg(self.primarychan, "WHA?! \002{0}\002 is not playing!".format(ev.splitd[1]))
+                    cli.privmsg(self.primarychan, "QUÉ?! \002{0}\002 no está jugando!".format(ev.splitd[1]))
                     return
                 nick = ev.splitd[1]
             else:
@@ -240,15 +240,15 @@ class Donger(object):
                 return
                 
             if self.turn != ev.source.lower():
-                cli.privmsg(self.primarychan, "Wait your fucking turn or I'll kill you.")
+                cli.privmsg(self.primarychan, "Espera tu maldito turno o te mataré.")
                 return
             
             if ev.source.lower() not in self.aliveplayers:
-                cli.privmsg(self.primarychan, "GET OUT OR I'LL KILL YOU! INTRUDER INTRUDER INTRUDER")
+                cli.privmsg(self.primarychan, "LÁRGATE DE AQUÍ O TE MATARÉ! INTRUSO INTRUSO INTRUSO")
                 return
             
             if ev.source.lower() in self.zombies:
-                cli.privmsg(self.primarychan, "Zombies can't heal")
+                cli.privmsg(self.primarychan, "Los zombies no pueden sanar")
                 return
             
             self.heal(ev.source)
@@ -257,15 +257,15 @@ class Donger(object):
                 return
                 
             if self.turn != ev.source.lower():
-                cli.privmsg(self.primarychan, "Wait your fucking turn or I'll kill you.")
+                cli.privmsg(self.primarychan, "Espera tu maldito turno o te mataré.")
                 return
             
             if ev.source.lower() not in self.aliveplayers:
-                cli.privmsg(self.primarychan, "GET OUT OR I'LL KILL YOU! INTRUDER INTRUDER INTRUDER")
+                cli.privmsg(self.primarychan, "LÁRGATE DE AQUÍ O TE MATARÉ! INTRUSO INTRUSO INTRUSO")
                 return
 
             if ev.source.lower() in self.haspraised or ev.source.lower() in self.zombies:
-                cli.privmsg(self.primarychan, "Your praises bore me.")
+                cli.privmsg(self.primarychan, "Tus oraciones me aburren.")
                 return
                 
             if self.deathmatch:
@@ -275,10 +275,10 @@ class Donger(object):
             if len(ev.splitd) != 1 and ev.splitd[1] != "":
                 nick = ev.splitd[1]
                 if ev.splitd[1].lower() not in self.aliveplayers and ev.splitd[1].lower() in list(self.health):
-                    cli.privmsg(self.primarychan, "WHAT?! Do you REALLY want to hit a corpse?!")
+                    cli.privmsg(self.primarychan, "QUÉ?! REALMENTE QUIERES GOLPEAR A UN CADÁVER?!")
                     return
                 if ev.splitd[1].lower() not in self.aliveplayers:
-                    cli.privmsg(self.primarychan, "WHA?! \002{0}\002 is not playing!".format(ev.splitd[1]))
+                    cli.privmsg(self.primarychan, "QUÉ?! \002{0}\002 no está jugando!".format(ev.splitd[1]))
                     return
             else:
                 nick = ev.source.lower()
@@ -288,7 +288,7 @@ class Donger(object):
             self.haspraised.append(ev.source.lower())
             if nick.lower() == cli.nickname.lower():
                 praiseroll = 2
-                cli.privmsg(self.primarychan, "You try and suckle my donger while fighting me?")
+                cli.privmsg(self.primarychan, "Tú intentas mamar mi donger mientras luchas contra mí?")
                 nick = ev.source
             if praiseroll == 1: #Heal
                 self.heal(nick, "praise")
@@ -301,10 +301,10 @@ class Donger(object):
             try:
                 self.pending[ev.source.lower()]
             except:
-                cli.privmsg(self.primarychan, "You can only use !cancel if you started a !fight")
+                cli.privmsg(self.primarychan, "Tú solo puedes usar !cancel si has hecho !fight")
                 return
             if self.gamerunning:
-                cli.privmsg(self.primarychan, "THE FIGHT WAS ALREADY STARTED, IF YOU'RE A COWARD USE !QUIT")
+                cli.privmsg(self.primarychan, "LA LUCHA HA COMENZADO, SI ERES UN COBARDE USA !QUIT")
                 return
             self.deathmatchpending = {}
             self.deathmatch = False
@@ -312,29 +312,29 @@ class Donger(object):
             del self._paccept[ev.source.lower()]
             self.deathmatchpending = {}
             self.deathmatch = False
-            cli.privmsg(self.primarychan, "{0}'s fight cancelled".format(ev.source))
+            cli.privmsg(self.primarychan, "pelea de {0} cancelada".format(ev.source))
         elif ev.splitd[0] == "!reject":
             if self.gamerunning:
                 return
             if len(ev.splitd) == 1 or ev.splitd[1] == "": # I hate you
-                cli.privmsg(self.primarychan, "Can you read? It's !reject <nick>")
+                cli.privmsg(self.primarychan, "Puedes leer? Es !reject <nick>")
                 return
             try:
                 if ev.source not in self.pending[ev.splitd[1].lower()]:
                     raise  # two in one
             except:
-                cli.privmsg(self.primarychan, "But... {0} never challenged you!".format(ev.splitd[1]))
+                cli.privmsg(self.primarychan, "Pero... {0} nunca te retó!".format(ev.splitd[1]))
                 return
             
             self.pending[ev.splitd[1].lower()].remove(ev.source)
             if len(self.pending[ev.splitd[1].lower()]) == 2 and cli.nickname in self.pending[ev.splitd[1].lower()]:
                 self.pending[ev.splitd[1].lower()].remove(cli.nickname)
             self._paccept[ev.splitd[1].lower()].remove(ev.source)
-            cli.privmsg(self.primarychan, "{0} fled out of the fight".format(ev.source))
+            cli.privmsg(self.primarychan, "{0} ha huído del combate".format(ev.source))
             if len(self.pending[ev.splitd[1].lower()]) == 1:
                 del self.pending[ev.splitd[1].lower()]
                 del self._paccept[ev.splitd[1].lower()]
-                cli.privmsg(self.primarychan, "Fight cancelled")
+                cli.privmsg(self.primarychan, "Pelea cancelada")
                 return
             
             if self._paccept[ev.splitd[1].lower()] == []:
@@ -348,7 +348,7 @@ class Donger(object):
             else:
                 cli.privmsg(ev.target, ev.arguments[0].replace(cli.nickname, ev.source))
         elif ev.arguments[0].lower().startswith("fuck off " + cli.nickname):
-            cli.privmsg(ev.target, "\001ACTION fucks {0}\001".format(ev.source))
+            cli.privmsg(ev.target, "\001ACTION jode a {0}\001".format(ev.source))
         elif ev.splitd[0] == "!help":
             self.commandHelp(cli, ev)
         elif ev.splitd[0] == "!excuse":
@@ -405,7 +405,7 @@ class Donger(object):
                 if c == 4:
                     break
             if self.statsurl != "":
-                cli.privmsg(ev.target, "More stats are available at {0}".format(self.statsurl))
+                cli.privmsg(ev.target, "Más estadísticas están disponibles en {0}".format(self.statsurl))
         elif ev.splitd[0] == "!mystats" or ev.splitd[0] == "!stats":
             if len(ev.splitd) != 1:
                 nick = ev.splitd[1]
@@ -423,7 +423,7 @@ class Donger(object):
                 cli.privmsg(ev.target, "\002{0}\002's stats: \002{1}\002 wins, \002{4}\002 easy wins, \002{2}\002 losses, \002{3}\002 coward quits, \002{5}\002 idle-outs, \002{6}\002 !praises, \002{7}\002 fights started, accepted \002{8}\002 fights, !joined \002{15}\002 fights (\002{9}\002 total fights), \002{10}\002 !hits, \002{11}\002 !heals, \002{12}\002HP of damage dealt and \002{13}\002 damage received. {14}".format(
                                         player.realnick, player.wins, player.losses, player.quits, player.easywins, player.idleouts, player.praises, player.fights, player.accepts, (player.wins + player.losses + player.quits), player.hits, player.heals, player.dcaused, player.dreceived, self.statsurl, totaljoins))
             except:
-                cli.privmsg(ev.target, "There are no registered stats for \002{0}\002".format(nick))
+                cli.privmsg(ev.target, "No hay estadísticas registradas para \002{0}\002".format(nick))
         else:
             try:
                 self.extracommands[ev.splitd[0]]
@@ -432,14 +432,14 @@ class Donger(object):
             self.extracommands[ev.splitd[0]](self, cli, ev)
     
     def commandHelp(self, cli, ev):
-        cli.privmsg(ev.target, "PM'd you my commands.")
-        cli.privmsg(ev.source, "Commands available only in {0}:".format(self.primarychan))
+        cli.privmsg(ev.target, "Te he enviado por mensaje privado mis comandos")
+        cli.privmsg(ev.source, "Comandos disponibles solo por {0}:".format(self.primarychan))
         cli.privmsg(ev.source, "  !fight <nickname> [othernicknames]: Challenge another player")
         cli.privmsg(ev.source, "  !deathmatch <nickname>: Same as fight, but only 1v1, and loser is bant for 20 minutes.")
         cli.privmsg(ev.source, "  !ascii <text>: Turns any text 13 characters or less into ascii art")
         cli.privmsg(ev.source, "  !cancel: Cancels a !fight")
         cli.privmsg(ev.source, "  !reject <nick>: Cowardly rejects a !fight")
-        cli.privmsg(ev.source, "Commands available everywhere:")
+        cli.privmsg(ev.source, "Comandos disponibles siempre:")
         cli.privmsg(ev.source, "  !raise: Commands users to raise their dongers")
         cli.privmsg(ev.source, "  !excuse: Outputs random BOFH excuse")
         cli.privmsg(ev.source, "  !jaden: Outputs random Jaden Smith tweet")
@@ -453,7 +453,7 @@ class Donger(object):
     def join(self, cli, fighter, ev):
         
         if not self.gamerunning:
-            cli.privmsg(fighter, "THE FUCKING GAME IS NOT RUNNING")
+            cli.privmsg(fighter, "EL MALDITO JUEGO NO HA INICIADO")
             return
             
         try:
@@ -467,24 +467,24 @@ class Donger(object):
                 raise
         except:
             if cli.channels[self.primarychan.lower()].users[fighter.lower()].account in self.accountsseenonthisgame and fighter != cli.nickname and ev.splitd[1] != "zombie":
-                cli.privmsg(fighter, "Stop trying to cheat, you dumb shit. To join as a zombie, say !join zombie")
+                cli.privmsg(fighter, "Deja de hacer trampa, qué estupidez. Para entrar como zombie usa !join zombie")
                 return 
         if fighter.lower() in self.aliveplayers:
-            cli.privmsg(fighter, "You're already playing, you dumb shit.")
+            cli.privmsg(fighter, "Tú estás jugando, estúpido.")
             return
         if fighter.lower() in self.deadplayers and ev.splitd[1] != "zombie":
-            cli.privmsg(fighter, "You can't rejoin a game after you've been killed.")
+            cli.privmsg(fighter, "No puedes volver a entrar una vez que estás muerto.")
             return
         if fighter.lower() in self.zombies:
             return
         elif ev.splitd[1] == "zombie":
             self.zombies.append(fighter.lower())
             if random.randint(1, 5) > 2:
-                cli.privmsg(fighter, "You have no brain and your zombie dies")
+                cli.privmsg(fighter, "No tienes cerebro y tu zombie murió")
                 return
         
         if self.deathmatch == True:
-            cli.privmsg(fighter, "You can't join a deathmatch.")
+            cli.privmsg(fighter, "No puedes entrar a un torneo a muerte")
             return
         self.playershealth = []
         for p in self.aliveplayers:
@@ -495,9 +495,9 @@ class Donger(object):
         self.maxheal[fighter.lower()] = 44
         if ev.splitd[1] == "zombie": # ooo zombie
             self.health[fighter.lower()] = int(self.health[fighter.lower()] / 1.3)
-            cli.privmsg(self.primarychan, "\002{0}\002's ZOMBIE JOINS THE FIGHT (\002{1}\002HP)".format(fighter.upper(), self.health[fighter.lower()]))
+            cli.privmsg(self.primarychan, "\002{0}\002's ZOMBIE ENTRA A LA PELEA (\002{1}\002HP)".format(fighter.upper(), self.health[fighter.lower()]))
         else:
-            cli.privmsg(self.primarychan, "\002{0}\002 JOINS THE FIGHT (\002{1}\002HP)".format(fighter.upper(), self.health[fighter.lower()]))
+            cli.privmsg(self.primarychan, "\002{0}\002 ENTRA A LA PELEA (\002{1}\002HP)".format(fighter.upper(), self.health[fighter.lower()]))
         
         if fighter.lower() not in self.allplayers:
             self.allplayers.append(fighter.lower())
@@ -593,7 +593,7 @@ class Donger(object):
         if modifier == "praise":
             healing = healing * 2
             self.verboseoutput("Verbose: Praise. Forcing critical heal.")
-            self.ascii("whatever")
+            self.ascii("como sea")
         else:
             self.countstat(nick, "heal")
         
@@ -614,7 +614,7 @@ class Donger(object):
         if self.gamerunning:
             if ev.source2.nick.lower() in self.aliveplayers:
                 self.ascii("coward")
-                self.irc.privmsg(self.primarychan, "The coward is dead!")
+                self.irc.privmsg(self.primarychan, "El cobarde está muerto!")
                 self.aliveplayers.remove(ev.source2.nick.lower())
                 self.deadplayers.append(ev.source2.nick.lower())
                 self.health[ev.source2.nick.lower()] = -1
@@ -679,19 +679,19 @@ class Donger(object):
             self.ascii(" V. ".join(fighters).upper(), "straight")
         else:
             cli.privmsg(self.primarychan, " V. ".join(fighters).upper())
-        cli.privmsg(self.primarychan, "RULES:")
-        cli.privmsg(self.primarychan, "1. Wait your turn. One person at a time.")
-        cli.privmsg(self.primarychan, "2. Be a dick about it.")
+        cli.privmsg(self.primarychan, "REGLAS:")
+        cli.privmsg(self.primarychan, "1. Espera tu turno, una persona a la vez.")
+        cli.privmsg(self.primarychan, "2. No seas tonto.")
         cli.privmsg(self.primarychan, " ")
-        cli.privmsg(self.primarychan, "Use !hit [nick] to strike.")
-        cli.privmsg(self.primarychan, "Use !heal to heal yourself.")
-        cli.privmsg(self.primarychan, "Use !praise [nick] to praise to the donger gods (once per game).")
-        cli.privmsg(self.primarychan, "Use '/msg {0} !join' to join a game mid-fight.".format(cli.nickname))
+        cli.privmsg(self.primarychan, "Usa !hit [nick] para atacar.")
+        cli.privmsg(self.primarychan, "Usa !heal para sanar tus heridas.")
+        cli.privmsg(self.primarychan, "Usa !praise [nick] para orar a los dioses (una vez por juego).")
+        cli.privmsg(self.primarychan, "Usa '/msg {0} !join para ingresar a una pelea' .".format(cli.nickname))
         cli.privmsg(self.primarychan, " ")
         
         for i in fighters:
             if cli.channels[self.primarychan.lower()].users[i.lower()].account in self.accountsseenonthisgame:
-                cli.privmsg(self.primarychan, "..... WAIT, WHAT?! Looks like somebody tried to play with two clones")
+                cli.privmsg(self.primarychan, "..... ESPERA QUÉ?! Alguien intenta entrar al juego con dos clones")
                 cli.mode(self.primarychan, "-m")
                 self.allplayers = []
                 return
