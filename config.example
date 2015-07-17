@@ -1,10 +1,10 @@
 {
     "server": "irc.freenode.net",
-    "nick": "botnick",
-    "channel": "#fightchannel",
+    "nick": "GodWhite",
+    "channel": "#ocioxtreme",
     "auxchans": ["#auxchannel1", "#auxchannel2"],
     "stats-url": "http://example.org",
-    "nickserv-user": "botusername",
+    "nickserv-user": "WhiteBot",
     "nickserv-pass": "botpassword",
     "modules": ["example"]
 }
